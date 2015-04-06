@@ -9,7 +9,8 @@
   :dependencies [[org.clojure/clojure "1.7.0-alpha6"]
                  [org.clojure/clojurescript "0.0-3169"]
                  [cljsjs/react "0.13.1-0"]
-                 [reagent "0.5.0"]]
+                 [reagent "0.5.0"]
+                 [re-frame "0.2.0"]]
 
   :plugins [[lein-cljsbuild "1.0.4"]]
 
@@ -43,7 +44,8 @@
 
                    :figwheel {:http-server-root "public"
                               :server-port 3449
-                              :css-dirs ["resources/public/css"]}
+                              :css-dirs ["resources/public/css"]
+                              :repl false}
 
                    :cljsbuild {:builds {:app {:source-paths ["env/dev/cljs"]
                                               :compiler {:main "loki.dev"
