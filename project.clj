@@ -10,7 +10,8 @@
                  [org.clojure/clojurescript "0.0-3169"]
                  [cljsjs/react "0.13.1-0"]
                  [reagent "0.5.0"]
-                 [re-frame "0.2.0"]]
+                 [re-frame "0.2.0"]
+                 [prismatic/schema "0.4.0"]]
 
   :plugins [[lein-cljsbuild "1.0.4"]]
 

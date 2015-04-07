@@ -5,7 +5,9 @@
                                    path
                                    register-handler
                                    register-sub
-                                   subscribe]]))
+                                   subscribe]]
+            [re-frame.utils :refer [warn]]
+            [schema.core :as s :include-macros true]))
 
 (defonce initial-state
   {:color "green"})
@@ -18,6 +20,25 @@
    (reaction (:color @db))))
 
 
+(defn event-type [type & r]
+  (into [(s/one (s/eq type) "type")] r))
+
+(def ColorEvent (event-type :color (s/one s/Str "color")))
+
+(defn validate
+  "Middleware which augments underlying handler call with Schema validation.
+
+  It's expected that handler itself is pure and provides required Schema
+  annotations."
+  [handler]
+  (fn new-handler
+    [db v]
+    (try
+      (s/with-fn-validation (handler db v))
+      (catch :default e
+        (warn e)
+        db))))
+
 (register-handler
  :initialize
  (fn
@@ -26,9 +47,9 @@
 
 (register-handler
  :color
- (path [:color])
- (fn
-   [time-color [_ value]]
+ [(path [:color]) validate]
+ (s/fn color-handler
+   [time-color [_ value] :- ColorEvent]
    value))
 
 
