@@ -9,5 +9,5 @@ pom.xml.asc
 /.nrepl-port
 /resources/public/js
 /out
-/.repl
+/.repl*
 figwheel_server.log
