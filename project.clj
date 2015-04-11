@@ -6,14 +6,14 @@
 
   :source-paths ["src/clj" "src/cljs"]
 
-  :dependencies [[org.clojure/clojure "1.7.0-alpha6"]
-                 [org.clojure/clojurescript "0.0-3169"]
+  :dependencies [[org.clojure/clojure "1.7.0-beta1"]
+                 [org.clojure/clojurescript "0.0-3196"]
                  [cljsjs/react "0.13.1-0"]
                  [reagent "0.5.0"]
                  [re-frame "0.2.0"]
                  [prismatic/schema "0.4.0"]]
 
-  :plugins [[lein-cljsbuild "1.0.4"]]
+  :plugins [[lein-cljsbuild "1.0.5"]]
 
   :min-lein-version "2.5.0"
 
@@ -33,11 +33,12 @@
                                   [figwheel "0.2.5"]
                                   [com.cemerick/piggieback "0.2.0"]
                                   [org.clojure/tools.nrepl "0.2.10"]
+                                  [org.clojure/tools.reader "0.9.1"]
                                   [pjstadig/humane-test-output "0.7.0"]]
 
                    :source-paths ["env/dev/clj"]
                    :plugins [[lein-figwheel "0.2.5"]
-                             [com.cemerick/clojurescript.test "0.3.2"]]
+                             [com.cemerick/clojurescript.test "0.3.3"]]
 
                    :injections [(require 'pjstadig.humane-test-output)
                                 (pjstadig.humane-test-output/activate!)]

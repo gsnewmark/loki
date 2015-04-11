@@ -33,4 +33,4 @@
 (deftest test-home
   (with-mounted-component (app/calling-component)
     (fn [c div]
-      (is (found-in #"I am a component" div)))))
+      (is (found-in #"Parent component" div)))))
