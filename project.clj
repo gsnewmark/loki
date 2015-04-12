@@ -22,31 +22,25 @@
   :cljsbuild {:builds {:app {:source-paths ["src/cljs"]
                              :compiler {:output-to     "resources/public/js/app.js"
                                         :output-dir    "resources/public/js/out"
-                                        :asset-path   "js/out"
+                                        :asset-path    "js/out"
                                         :optimizations :none
                                         :pretty-print  true}}}}
 
   :profiles {:dev {:repl-options {:init-ns loki.repl
                                   :nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}
 
-                   :dependencies [[leiningen "2.5.1"]
-                                  [figwheel "0.2.5"]
+                   :dependencies [[figwheel "0.2.6"]
+                                  [figwheel-sidecar "0.2.6"]
                                   [com.cemerick/piggieback "0.2.0"]
                                   [org.clojure/tools.nrepl "0.2.10"]
                                   [org.clojure/tools.reader "0.9.1"]
                                   [pjstadig/humane-test-output "0.7.0"]]
 
                    :source-paths ["env/dev/clj"]
-                   :plugins [[lein-figwheel "0.2.5"]
-                             [com.cemerick/clojurescript.test "0.3.3"]]
+                   :plugins [[com.cemerick/clojurescript.test "0.3.3"]]
 
                    :injections [(require 'pjstadig.humane-test-output)
                                 (pjstadig.humane-test-output/activate!)]
-
-                   :figwheel {:http-server-root "public"
-                              :server-port 3449
-                              :css-dirs ["resources/public/css"]
-                              :repl false}
 
                    :cljsbuild {:builds {:app {:source-paths ["env/dev/cljs"]
                                               :compiler {:main "loki.dev"

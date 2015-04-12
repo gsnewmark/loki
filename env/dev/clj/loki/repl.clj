@@ -1,5 +1,9 @@
 (ns loki.repl
-  (:require [loki.dev :refer :all]))
+  (:require [loki.dev :as dev]))
 
-(defn run []
-  (start-figwheel))
+(defn start []
+  (dev/start-figwheel)
+  (dev/browser-repl))
+
+(defn stop []
+  (dev/stop-figwheel))
