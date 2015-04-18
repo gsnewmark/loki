@@ -7,13 +7,13 @@
   :source-paths ["src/clj" "src/cljs"]
 
   :dependencies [[org.clojure/clojure "1.7.0-beta1"]
-                 [org.clojure/clojurescript "0.0-3196"]
+                 [org.clojure/clojurescript "0.0-3208"]
                  [cljsjs/react "0.13.1-0"]
                  [reagent "0.5.0"]
-                 [re-frame "0.2.0"]
+                 [re-frame "0.3.1"]
                  [prismatic/schema "0.4.0"]]
 
-  :plugins [[lein-cljsbuild "1.0.5"]]
+  :plugins [[lein-cljsbuild "1.0.6-SNAPSHOT"]]
 
   :min-lein-version "2.5.0"
 
@@ -29,15 +29,15 @@
   :profiles {:dev {:repl-options {:init-ns loki.repl
                                   :nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}
 
-                   :dependencies [[figwheel "0.2.6"]
-                                  [figwheel-sidecar "0.2.6"]
-                                  [com.cemerick/piggieback "0.2.0"]
+                   :dependencies [[figwheel "0.2.7-SNAPSHOT"]
+                                  [figwheel-sidecar "0.2.7-SNAPSHOT"]
+                                  [com.cemerick/piggieback "0.2.1-SNAPSHOT"]
                                   [org.clojure/tools.nrepl "0.2.10"]
                                   [org.clojure/tools.reader "0.9.1"]
                                   [pjstadig/humane-test-output "0.7.0"]]
 
                    :source-paths ["env/dev/clj"]
-                   :plugins [[com.cemerick/clojurescript.test "0.3.3"]]
+                   :plugins [[com.cemerick/clojurescript.test "0.3.4-SNAPSHOT"]]
 
                    :injections [(require 'pjstadig.humane-test-output)
                                 (pjstadig.humane-test-output/activate!)]
