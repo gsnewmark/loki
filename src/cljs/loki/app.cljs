@@ -127,7 +127,7 @@
 
 (defn ^:export run []
   (dispatch [:initialize])
-  (xhr/send "ua-regions.json"
+  (xhr/send "ua-regions.geojson"
             (fn [event]
               (let [res (-> event .-target .getResponseText)]
                 (dispatch [:ua-regions-json (.parse js/JSON res)]))))
