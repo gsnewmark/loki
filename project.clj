@@ -11,7 +11,8 @@
                  [cljsjs/react "0.13.1-0"]
                  [reagent "0.5.0"]
                  [re-frame "0.3.1"]
-                 [prismatic/schema "0.4.0"]]
+                 [prismatic/schema "0.4.0"]
+                 [cljsjs/leaflet "0.7.3-0"]]
 
   :plugins [[lein-cljsbuild "1.0.6-SNAPSHOT"]]
 
