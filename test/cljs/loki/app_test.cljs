@@ -31,6 +31,6 @@
 
 
 (deftest test-home
-  (with-mounted-component (app/calling-component)
+  (with-mounted-component (app/page-component)
     (fn [c div]
-      (is (found-in #"Parent component" div)))))
+      (is (found-in #"loki" div)))))

@@ -12,29 +12,29 @@
             [cljsjs.leaflet]))
 
 (defonce initial-state
-  {:color "green"
-   :ua-regions-json nil})
+  {:geojson nil})
 
 
 (register-sub
- :color
+ :geojson
  (fn
    [db _]
-   (reaction (:color @db))))
-
-(register-sub
- :ua-regions-json
- (fn
-   [db _]
-   (reaction (:ua-regions-json @db))))
+   (reaction (:geojson @db))))
 
 
-(defn event-type [type & r]
+(defn event-type
+  "Generates Schema description for vector with first element equal to the
+  passed type and all other equal to the rest arguments"
+  [type & r]
   (into [(s/one (s/eq type) "type")] r))
 
-(def ColorEvent (event-type :color (s/one s/Str "color")))
+(def GeoJSON js/Object)
 
-(def UaRegionsJsonEvent (event-type :ua-regions-json (s/one js/Object "json")))
+(def GeoJSONReceivedEvent
+  (event-type :geojson-received (s/one GeoJSON "geojson")))
+
+(def InitializeEvent
+  (event-type :initialize))
 
 (defn validate
   "Middleware which augments underlying handler call with Schema validation.
@@ -50,79 +50,54 @@
         (warn e)
         db))))
 
+(s/defn initialize-handler
+  [db _ :- InitializeEvent]
+  (merge db initial-state))
+
+(s/defn geojson-received-handler
+  [geojson [_ value] :- GeoJSONReceivedEvent]
+  value)
+
 (register-handler
  :initialize
- (fn
-   [db _]
-   (merge db initial-state)))
+ [validate]
+ initialize-handler)
 
 (register-handler
- :color
- [(path [:color]) validate]
- (s/fn color-handler
-   [time-color [_ value] :- ColorEvent]
-   value))
+ :geojson-received
+ [(path [:geojson]) validate]
+ geojson-received-handler)
 
-(register-handler
- :ua-regions-json
- [(path [:ua-regions-json]) validate]
- (s/fn color-handler
-   [json [_ value] :- UaRegionsJsonEvent]
-   value))
-
-
-(defn some-component []
-  (let [color (subscribe [:color])]
-    (fn []
-      (when @color
-        [:div
-         [:h3 "I am a component!"]
-         [:p.someclass
-          "I have " [:strong "bold"]
-          [:span {:style {:color @color}} " and colored"]
-          " text."]]))))
-
-(defn color-input []
-  (let [color (subscribe [:color])]
-    (fn []
-      [:div.color-input
-       "Color: "
-       [:input {:type "text"
-                :value @color
-                :on-change #(dispatch
-                             [:color (-> % .-target .-value)])}]])))
 
 (defn map-holder []
-  [:div [:h1 "Map"]
-   [:div#map ]
-   ])
+  [:div [:h3 "Map"]
+   [:div#map]])
 
-(defn map-did-mount-gen [regions]
+(defn add-map-with [geojson]
   (fn []
     (let [map (.setView (.map js/L "map") #js [49 31] 5)]
-      (doto map)
       (.addTo (.tileLayer js/L "http://{s}.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={token}"
                           (clj->js {:attribution "Map data &copy; [...]"
                                     :id "gsnewmark.lp1opmko"
-                                    :token ""
+                                    :token "pk.eyJ1IjoiZ3NuZXdtYXJrIiwiYSI6IkFfcXR6Q3cifQ.-8u0leDtUFLwPkO9kQRcTQ"
                                     :minZoom 5
                                     :maxZoom 6}))
               map)
-      (.addTo (.geoJson js/L regions)
+      (.addTo (.geoJson js/L geojson)
               map))))
 
-(defn map-component [regions]
+(defn map-component [geojson]
   (reagent/create-class {:reagent-render map-holder
-                         :component-did-mount (map-did-mount-gen regions)}))
+                         :component-did-mount (add-map-with geojson)}))
 
-(defn calling-component []
-  (let [regions (subscribe [:ua-regions-json])]
+(defn page-component []
+  (let [geojson (subscribe [:geojson])]
     (fn []
-      [:div "Parent component"
-       [some-component]
-       [color-input]
-       (when @regions
-         [map-component @regions])])))
+      [:div
+       [:h2 "loki"]
+       (if @geojson
+         [map-component @geojson]
+         "Loading...")])))
 
 
 (defn ^:export run []
@@ -130,6 +105,6 @@
   (xhr/send "ua-regions.geojson"
             (fn [event]
               (let [res (-> event .-target .getResponseText)]
-                (dispatch [:ua-regions-json (.parse js/JSON res)]))))
-  (reagent/render-component [calling-component]
+                (dispatch [:geojson-received (.parse js/JSON res)]))))
+  (reagent/render-component [page-component]
                             (.getElementById js/document "app")))
