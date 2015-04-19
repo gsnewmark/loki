@@ -6563,7 +6563,7 @@
     {
       "type": "Feature",
       "properties": {
-        "type": "Cherkasy Oblast"
+        "name": "Cherkasy Oblast"
       },
       "geometry": {
         "type": "Polygon",
