@@ -52,9 +52,9 @@
 (def InitializeEvent
   (event-type :initialize))
 
-(def RegionDataReceivedEvent
-  (event-type :region-data-received
-              (s/one s/Str "region") {:wins s/Int :treasons s/Int}))
+(def TweetReceivedEvent
+  (event-type :tweet-received
+              {:tweet s/Any :rating (s/enum :win :treason) :region s/Str}))
 
 (def LeafletGeoJsonAddedEvent
   (event-type :leaflet-geojson-added (s/one LeafletGeoJson "leafletGeoJson")))
@@ -81,9 +81,17 @@
   [geojson [_ value] :- GeoJSONReceivedEvent]
   value)
 
-(s/defn region-data-received-handler
-  [db [_ region data] :- RegionDataReceivedEvent]
-  (assoc-in db [:regions-data region] data))
+(s/defn tweet-received-handler
+  [db [_ tweet-event] :- TweetReceivedEvent]
+  (let [{:keys [region rating tweet]} tweet-event]
+    (update-in db [:regions-data region]
+               (fn [val]
+                 (let [num-rating (if (= :win rating) 1 -1)]
+                   (if val
+                     (let [{:keys [tweets rating]} val]
+                       {:tweets (conj tweets tweet)
+                        :rating (+ rating num-rating)})
+                     {:tweets [tweet] :rating num-rating}))))))
 
 (s/defn leaflet-geojson-added-handler
   [db [_ map] :- LeafletGeoJsonAddedEvent]
@@ -100,9 +108,9 @@
  geojson-received-handler)
 
 (register-handler
- :region-data-received
+ :tweet-received
  [validate]
- region-data-received-handler)
+ tweet-received-handler)
 
 (register-handler
  :leaflet-geojson-added
@@ -117,22 +125,21 @@
     [:div [:h3 "Map"]
      [:div#map]]))
 
-(defn get-color [wins treasons]
-  (let [rating (- wins treasons)]
-    (cond
-      (< rating 0) "#fee090"
-      (< rating -10) "#fdae61"
-      (< rating -20) "#f46d43"
-      (< rating -30) "#d73027"
-      (< rating -40) "#a50026"
+(defn get-color [rating]
+  (cond
+    (< rating -40) "#a50026"
+    (< rating -30) "#d73027"
+    (< rating -20) "#f46d43"
+    (< rating -10) "#fdae61"
+    (< rating 0) "#fee090"
 
-      (> rating 0) "#e0f3f8"
-      (> rating 10) "#abd9e9"
-      (> rating 20) "#74add1"
-      (> rating 30) "#4575b4"
-      (> rating 40) "#313695"
+    (> rating 40) "#313695"
+    (> rating 30) "#4575b4"
+    (> rating 20) "#74add1"
+    (> rating 10) "#abd9e9"
+    (> rating 0) "#e0f3f8"
 
-      :else "#ffffbf")))
+    :else "#ffffbf"))
 
 (defn style [regions-data]
   (fn [feature]
@@ -140,8 +147,7 @@
                                   (.-properties)
                                   (.-name))
                       region-data (get regions-data region {})]
-                  (get-color (get region-data :wins 0)
-                             (get region-data :treasons 0)))
+                  (get-color (get region-data :rating 0)))
      :weight 2
      :opacity 1
      :color "white"
