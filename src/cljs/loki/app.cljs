@@ -195,11 +195,29 @@
          "Loading...")])))
 
 
+(defn one-of [s] (first (shuffle s)))
+
+(defn simulate-server [regions]
+  (js/setInterval
+   (fn []
+     (dispatch [:tweet-received
+                {:tweet "tweet"
+                 :rating (one-of [:win :treason])
+                 :region (one-of regions)}]))
+   1000))
+
 (defn ^:export run []
   (dispatch [:initialize])
   (xhr/send "ua-regions.geojson"
             (fn [event]
-              (let [res (-> event .-target .getResponseText)]
-                (dispatch [:geojson-received (.parse js/JSON res)]))))
+              (let [res (-> event .-target .getResponseText)
+                    geojson (.parse js/JSON res)]
+                (dispatch [:geojson-received geojson])
+                (simulate-server
+                 (map
+                  (fn [r] (get-in r ["properties" "name"]))
+                  (-> geojson
+                      js->clj
+                      (get "features")))))))
   (reagent/render-component [page-component]
                             (.getElementById js/document "app")))
